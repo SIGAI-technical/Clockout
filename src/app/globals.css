@@ -273,6 +273,191 @@ body {
   background: radial-gradient(ellipse at center, rgba(5,6,5,0.05) 15%, rgba(5,6,5,0.65) 60%, rgba(5,6,5,0.97) 100%);
 }
 
+/* ─── Avengers-Style Monumental Metallic Title ────────────────────────── */
+
+/* Volumetric emerald backlight behind the title */
+.avengers-backlight {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(100vw, 920px);
+  height: min(65vh, 520px);
+  background: radial-gradient(
+    ellipse 65% 55% at 50% 50%,
+    rgba(61, 220, 132, 0.28) 0%,
+    rgba(32, 102, 58, 0.16) 40%,
+    rgba(10, 32, 18, 0.06) 65%,
+    transparent 85%
+  );
+  filter: blur(45px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Secondary subtle glint core */
+.avengers-core-glint {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(85vw, 480px);
+  height: 240px;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(61, 220, 132, 0.14) 35%,
+    transparent 70%
+  );
+  filter: blur(28px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Base title card container */
+.cinematic-title-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  z-index: 10;
+}
+
+/* Single h1: Heavy, monumental, dark gunmetal superhero film title */
+.cinematic-title {
+  position: relative;
+  font-family: var(--font-oswald), -apple-system, BlinkMacSystemFont, 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(2.4rem, 8.5vw, 6.8rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: clamp(0.02em, 0.6vw, 0.05em);
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin: 0;
+  padding: 0;
+  /* Dual-layer background: animated silver/emerald sweep + dark gunmetal gradient */
+  background-image:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      transparent calc(var(--sweep-pos, -30%) - 14%),
+      rgba(61, 220, 132, 0.45) calc(var(--sweep-pos, -30%) - 5%),
+      #ffffff var(--sweep-pos, -30%),
+      rgba(61, 220, 132, 0.55) calc(var(--sweep-pos, -30%) + 5%),
+      transparent calc(var(--sweep-pos, -30%) + 14%),
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      #f5f8f6 0%,
+      #d4dfd8 14%,
+      #84978c 32%,
+      #3a483f 48%,
+      #19231e 50%,
+      #2d3a31 53%,
+      #5c6e63 70%,
+      #242e27 86%,
+      #101512 100%
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* Bevel highlights and cinematic shadow on single element */
+  filter:
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.45))
+    drop-shadow(0 2px 0 #1b241e)
+    drop-shadow(0 6px 14px rgba(0, 0, 0, 0.95))
+    drop-shadow(0 16px 32px rgba(0, 0, 0, 0.92))
+    drop-shadow(0 0 28px rgba(61, 220, 132, 0.22));
+}
+
+/* 4.0 portion of the title */
+.title-number {
+  display: inline-block;
+  margin-left: clamp(0.25rem, 0.8vw, 0.75rem);
+  background-image:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #b5f5d0 18%,
+      #3ddc84 48%,
+      #1c7942 75%,
+      #0d4222 100%
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 16px rgba(61, 220, 132, 0.65));
+}
+
+/* Anamorphic light flare that tracks across the title */
+.title-sweep-flare {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  width: clamp(120px, 20vw, 240px);
+  transform: translateY(-50%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(61, 220, 132, 0.7) 25%,
+    #ffffff 50%,
+    rgba(61, 220, 132, 0.7) 75%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 14px #3ddc84,
+    0 0 30px #ffffff;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* Tagline: THE DOOM TAKEOVER */
+.cinematic-tagline {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: clamp(0.7rem, 1.6vw, 1.15rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: clamp(0.28em, 0.9vw, 0.52em);
+  text-transform: uppercase;
+  color: #a4b8ac;
+  text-shadow:
+    0 0 18px rgba(61, 220, 132, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.95);
+  margin-top: clamp(0.6rem, 1.2vw, 1rem);
+  margin-bottom: 0;
+}
+
+/* Floating micro-particles */
+.metal-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: rgba(61, 220, 132, 0.65);
+  box-shadow: 0 0 8px rgba(61, 220, 132, 0.8);
+  animation: float-particle var(--dur, 6s) ease-in-out infinite var(--delay, 0s);
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-90px) translateX(var(--drift, 20px)) scale(0.3);
+    opacity: 0;
+  }
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .text-hero-sm { font-size: clamp(2.2rem, 11vw, 4rem); }

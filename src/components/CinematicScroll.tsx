@@ -10,8 +10,7 @@ import React, {
 } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { EVENT_CONFIG } from "@/config/event";
-import { Calendar, MapPin, Clock } from "lucide-react";
+import CinematicTitleReveal from "@/components/CinematicTitleReveal";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -21,16 +20,12 @@ if (typeof window !== "undefined") {
 const V1_DUR    = 6.966;
 const V2_DUR    = 6.166;
 const V3_DUR    = 9.333;
-const AUDIO_DUR = 11.083;
+const AUDIO_DUR = 31.03; // Full Avengers theme duration
 
 // ─── Subtitle timing (seconds into V3+audio sequence) ────────────────────────
 const T_HELL_END   = 5.5;
 const T_FORIAM_END = 7.5;
 const T_DOOM_END   = V3_DUR;
-
-// CLOCKOUT sweep starts on freeze frame
-const T_CLOCKOUT = V3_DUR;
-const SWEEP_S    = 1.6;
 
 export interface CinematicScrollHandle {
   skipIntro: () => void;
@@ -86,43 +81,6 @@ function Subtitles({ t }: { t: number | null }) {
   );
 }
 
-// ─── CLOCKOUT mask sweep ───────────────────────────────────────────────────────
-function ClockoutReveal({ t }: { t: number | null }) {
-  if (t === null || t < T_CLOCKOUT) return null;
-  const elapsed  = t - T_CLOCKOUT;
-  const prog     = Math.min(1, elapsed / SWEEP_S);
-  const revPct   = prog * 110;
-  const trailPct = Math.max(0, revPct - 12);
-  const flarePct = Math.min(100, revPct);
-  const showF    = prog < 0.97;
-  const mask     = `linear-gradient(to right,white 0%,white ${trailPct}%,rgba(255,255,255,.05) ${revPct}%,transparent ${revPct + 1}%)`;
-  const afterS   = elapsed - SWEEP_S;
-  const numOp    = afterS > 0 ? Math.min(1, afterS / 0.55) : 0;
-  const tagOp    = afterS > .15 ? Math.min(1, (afterS - .15) / .55) : 0;
-
-  return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ zIndex: 36 }}>
-      <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom,rgba(0,0,0,.72) 0%,rgba(0,0,0,.28) 50%,rgba(0,0,0,.72) 100%)" }} />
-      <div className="relative flex flex-col items-center" style={{ zIndex: 1 }}>
-        {showF && (
-          <div style={{ position: "absolute", top: "-35%", height: "170%", left: `${flarePct}%`, width: "3px", background: "linear-gradient(to bottom,transparent 0%,rgba(255,255,255,.95) 30%,rgba(201,162,39,.85) 50%,rgba(255,255,255,.95) 70%,transparent 100%)", filter: "blur(2.5px)", boxShadow: "0 0 18px rgba(255,255,255,.85),0 0 36px rgba(201,162,39,.55)" }} />
-        )}
-        <div style={{ fontFamily: "var(--font-bebas),'Arial Narrow',sans-serif", fontSize: "clamp(4.5rem,16vw,12rem)", lineHeight: 1, letterSpacing: ".05em", color: "#fff", textShadow: "0 0 80px rgba(61,220,132,.5),0 0 160px rgba(61,220,132,.25)", WebkitMaskImage: mask, maskImage: mask }}>
-          CLOCKOUT
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: ".8rem", marginTop: ".1rem", opacity: numOp }}>
-          <div style={{ height: "1px", width: "clamp(24px,3.5vw,44px)", background: "linear-gradient(to right,transparent,rgba(201,162,39,.8))" }} />
-          <span style={{ fontFamily: "var(--font-bebas),sans-serif", fontSize: "clamp(1.5rem,4vw,2.8rem)", lineHeight: 1, letterSpacing: ".15em", color: "#c9a227", textShadow: "0 0 30px rgba(201,162,39,.7)" }}>4.0</span>
-          <div style={{ height: "1px", width: "clamp(24px,3.5vw,44px)", background: "linear-gradient(to left,transparent,rgba(201,162,39,.8))" }} />
-        </div>
-        <div style={{ fontFamily: "var(--font-oswald),sans-serif", fontSize: "clamp(.55rem,1.6vw,.85rem)", fontWeight: 400, letterSpacing: ".5em", textTransform: "uppercase", color: "rgba(61,220,132,.85)", marginTop: ".4rem", opacity: tagOp, textShadow: "0 0 20px rgba(61,220,132,.5)" }}>
-          THE DOOM TAKEOVER
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Component ────────────────────────────────────────────────────────────────
 const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
   ({ onRegisterClick, onCinematicComplete, isMuted = false }, ref) => {
@@ -138,27 +96,34 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
     const t2LayerRef      = useRef<HTMLDivElement>(null);
     const v3LayerRef      = useRef<HTMLDivElement>(null);
     const freezeLayerRef  = useRef<HTMLDivElement>(null);
-    const heroOverlayRef  = useRef<HTMLDivElement>(null);
     const progressWrapRef = useRef<HTMLDivElement>(null);
     // Invisible click-catcher that triggers V3 on Safari (where play() must be from a click)
     const clickCatcherRef = useRef<HTMLDivElement>(null);
 
-    const [isMobile, setIsMobile]   = useState(false);
-    const [seqTime, setSeqTime]     = useState<number | null>(null);
+    const [isMobile, setIsMobile]         = useState(false);
+    const [seqTime, setSeqTime]           = useState<number | null>(null);
+    const [isCompleted, setIsCompleted]   = useState(false);
+    const [reducedMotion, setReducedMotion] = useState(false);
     const [waitingClick, setWaitingClick] = useState(false); // show "tap to continue" on Safari
 
-    const isMutedRef      = useRef(isMuted);
-    useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
+    const isMutedRef = useRef(isMuted);
+    useEffect(() => {
+      isMutedRef.current = isMuted;
+      if (audioRef.current) {
+        audioRef.current.muted = isMuted;
+      }
+    }, [isMuted]);
 
     const onCinematicCompleteRef = useRef(onCinematicComplete);
     useEffect(() => { onCinematicCompleteRef.current = onCinematicComplete; }, [onCinematicComplete]);
 
-    const completedRef     = useRef(false);
-    const v3StartedRef     = useRef(false);
-    const v3PendingRef     = useRef(false); // scroll reached 70% but click hasn't fired yet
-    const userScrolledRef  = useRef(false);
-    const rafRef           = useRef<number | null>(null);
-    const unlockScrollRef  = useRef<(() => void) | null>(null);
+    const completedRef      = useRef(false);
+    const v3StartedRef      = useRef(false);
+    const v3PendingRef      = useRef(false);
+    const userScrolledRef   = useRef(false);
+    const scrollUnlockedRef = useRef(false);
+    const rafRef            = useRef<number | null>(null);
+    const unlockScrollRef   = useRef<(() => void) | null>(null);
 
     // ── Seek manager ──────────────────────────────────────────────────────────
     const seekingRef = useRef<Record<string, boolean>>({ v1: false, v2: false, v3: false });
@@ -210,9 +175,10 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
           el.removeEventListener("canplay", onR);
         };
       });
+      const currentFb = fbRef.current;
       return () => {
         fns.forEach(f => f());
-        Object.values(fbRef.current).forEach(t => { if (t) clearTimeout(t); });
+        Object.values(currentFb).forEach(t => { if (t) clearTimeout(t); });
       };
     }, []);
 
@@ -245,6 +211,7 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
     const handleComplete = useCallback(() => {
       if (completedRef.current) return;
       completedRef.current = true;
+      setIsCompleted(true);
       if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
       setSeqTime(null);
       setWaitingClick(false);
@@ -262,12 +229,6 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
         : document.body.scrollHeight;
       window.scrollTo({ top: endPos, behavior: "auto" });
 
-      const hero = heroOverlayRef.current;
-      if (hero) {
-        hero.style.visibility = "visible"; hero.style.pointerEvents = "auto";
-        gsap.killTweensOf(hero);
-        gsap.fromTo(hero, { opacity: 0, scale: .94, y: 18 }, { opacity: 1, scale: 1, y: 0, duration: 1.1, ease: "power3.out" });
-      }
       onCinematicCompleteRef.current?.(true);
     }, []);
 
@@ -298,6 +259,7 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       if (audio) {
         if (audio.currentTime > .05) audio.currentTime = 0;
         audio.volume = 1.0;
+        audio.muted = isMutedRef.current;
       }
 
       const t0 = performance.now();
@@ -307,21 +269,18 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
         if (v3) { try { v3.load(); v3.play().catch(() => {}); } catch { /**/ } }
       });
 
-      // Audio: try unmuted. On Safari after a real click this works.
-      // If blocked, try muted-then-unmute. If still blocked, show the tap button.
+      // Audio: try unmuted. If blocked, show tap prompt as fallback.
       if (audio) {
         audio.muted = isMutedRef.current;
         audio.play()
           .then(() => { /* playing unmuted ✓ */ })
           .catch(() => {
-            // Fallback: play muted then immediately unmute (always allowed once playing)
+            // Fallback: try muted-then-unmute
             audio.muted = true;
             audio.play()
               .then(() => { audio.muted = isMutedRef.current; })
               .catch(() => {
-                // Total block — show button
-                setWaitingClick(false);
-                // Show a minimal unmute button
+                setWaitingClick(true);
                 const btn = document.getElementById("unmute-btn");
                 if (btn) btn.style.display = "flex";
               });
@@ -353,6 +312,13 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
         if (t >= V3_DUR - .3 && freezeLayerRef.current)
           freezeLayerRef.current.style.opacity = `${Math.min(1, (t - (V3_DUR - .3)) / .3)}`;
 
+        // When title & event details are fully revealed, unlock scrolling so user can scroll if they want
+        if (t >= 20.5 && !scrollUnlockedRef.current) {
+          scrollUnlockedRef.current = true;
+          unlockScrollRef.current?.();
+          onCinematicCompleteRef.current?.(true);
+        }
+
         if (aud?.ended || t >= AUDIO_DUR + .2) { handleComplete(); return; }
 
         setSeqTime(t);
@@ -363,6 +329,9 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       if (audio) audio.onended = handleComplete;
     }, [lockScroll, handleComplete]);
 
+    const doPlayRef = useRef(doPlay);
+    useEffect(() => { doPlayRef.current = doPlay; }, [doPlay]);
+
     // ── Skip / Replay ─────────────────────────────────────────────────────────
     const handleSkip = useCallback(() => {
       if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
@@ -371,6 +340,7 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       setSeqTime(null); setWaitingClick(false);
       unlockScrollRef.current?.();
       v3StartedRef.current = true; v3PendingRef.current = false; completedRef.current = true;
+      setIsCompleted(true);
       pendingRef.current = { v1: null, v2: null, v3: null };
 
       if (v1LayerRef.current) v1LayerRef.current.style.opacity = "0";
@@ -379,7 +349,6 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       if (t2LayerRef.current) { t2LayerRef.current.style.opacity = "0"; t2LayerRef.current.style.visibility = "hidden"; }
       if (v3LayerRef.current) v3LayerRef.current.style.opacity = "1";
       if (freezeLayerRef.current) freezeLayerRef.current.style.opacity = "1";
-      if (heroOverlayRef.current) { heroOverlayRef.current.style.opacity = "1"; heroOverlayRef.current.style.transform = "none"; heroOverlayRef.current.style.visibility = "visible"; heroOverlayRef.current.style.pointerEvents = "auto"; }
       if (progressWrapRef.current) progressWrapRef.current.style.opacity = "0";
 
       const trig   = ScrollTrigger.getById("cinematic-trigger");
@@ -393,6 +362,8 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       try { if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; } } catch { /**/ }
       unlockScrollRef.current?.();
       v3StartedRef.current = false; v3PendingRef.current = false; completedRef.current = false;
+      setIsCompleted(false);
+      scrollUnlockedRef.current = false;
       setSeqTime(null); setWaitingClick(false);
       window.scrollTo({ top: 0, behavior: "auto" });
       [v1Ref, v2Ref, v3Ref].forEach(r => { try { r.current?.pause(); if (r.current) r.current.currentTime = 0; } catch { /**/ } });
@@ -402,7 +373,6 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       if (t2LayerRef.current) { t2LayerRef.current.style.opacity = "0"; t2LayerRef.current.style.visibility = "hidden"; }
       if (v3LayerRef.current) v3LayerRef.current.style.opacity = "0";
       if (freezeLayerRef.current) freezeLayerRef.current.style.opacity = "0";
-      if (heroOverlayRef.current) { heroOverlayRef.current.style.opacity = "0"; heroOverlayRef.current.style.visibility = "hidden"; heroOverlayRef.current.style.pointerEvents = "none"; }
       if (progressWrapRef.current) progressWrapRef.current.style.opacity = "1";
       onCinematicCompleteRef.current?.(false);
     }, []);
@@ -446,7 +416,12 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       const stage     = stageRef.current;
       if (!container || !stage) return;
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        requestAnimationFrame(() => { completedRef.current = true; onCinematicCompleteRef.current?.(true); });
+        requestAnimationFrame(() => {
+          completedRef.current = true;
+          setIsCompleted(true);
+          setReducedMotion(true);
+          onCinematicCompleteRef.current?.(true);
+        });
         return;
       }
       const mult = isMobile ? 5.0 : 6.5;
@@ -460,14 +435,16 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
             if (!userScrolledRef.current && p > .05) { window.scrollTo(0, 0); return; }
 
             if (completedRef.current && p < .65) {
-              completedRef.current = false; v3StartedRef.current = false; v3PendingRef.current = false;
-              if (heroOverlayRef.current) { heroOverlayRef.current.style.opacity = "0"; heroOverlayRef.current.style.visibility = "hidden"; heroOverlayRef.current.style.pointerEvents = "none"; }
+              completedRef.current = false;
+              v3StartedRef.current = false;
+              v3PendingRef.current = false;
+              setIsCompleted(false);
+              scrollUnlockedRef.current = false;
               if (freezeLayerRef.current)  freezeLayerRef.current.style.opacity  = "0";
               if (v3LayerRef.current)      v3LayerRef.current.style.opacity      = "0";
               onCinematicCompleteRef.current?.(false);
             }
             if (completedRef.current) {
-              if (heroOverlayRef.current) { heroOverlayRef.current.style.opacity = "1"; heroOverlayRef.current.style.visibility = "visible"; heroOverlayRef.current.style.pointerEvents = "auto"; }
               if (freezeLayerRef.current)  freezeLayerRef.current.style.opacity  = "1";
               if (v3LayerRef.current)      v3LayerRef.current.style.opacity      = "1";
               if (progressWrapRef.current) progressWrapRef.current.style.opacity = "0";
@@ -521,7 +498,7 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
               } else { t2LayerRef.current.style.opacity = "0"; t2LayerRef.current.style.visibility = "hidden"; }
             }
 
-            // At p >= 0.70: mark as pending — actual play() will fire from the click catcher
+            // At p >= 0.70: show tap/touch prompt to authorize audio and start V3
             if (p >= .70 && !v3StartedRef.current && !v3PendingRef.current && !completedRef.current) {
               v3PendingRef.current = true;
               setWaitingClick(true);
@@ -630,47 +607,20 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
             </button>
           </div>
 
-          {/* Subtitles */}
+          {/* Dialogue Subtitles (Hell Answers to me... FOR I AM DOOM) */}
           <Subtitles t={seqTime} />
 
-          {/* CLOCKOUT */}
-          <ClockoutReveal t={seqTime} />
+          {/* Cinematic Avengers-Style Monumental Metallic Title Reveal */}
+          <CinematicTitleReveal
+            t={seqTime}
+            isCompleted={isCompleted}
+            onRegisterClick={onRegisterClick}
+            reducedMotion={reducedMotion}
+          />
 
           {/* Scroll prompt */}
           <div ref={progressWrapRef} className="absolute bottom-6 inset-x-0 flex flex-col items-center pointer-events-none transition-opacity duration-500" style={{ zIndex: 30 }}>
             <span className="text-[10px] sm:text-xs tracking-[.35em] uppercase text-white/50 animate-pulse" style={{ fontFamily: "var(--font-inter),monospace" }}>scroll ↓</span>
-          </div>
-
-          {/* Hero overlay */}
-          <div ref={heroOverlayRef} id="main-hero" className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 sm:px-6 pointer-events-none" style={{ zIndex: 30, opacity: 0, visibility: "hidden" }}>
-            <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 85% 70% at 50% 55%,rgba(0,0,0,.45) 0%,rgba(0,0,0,.85) 100%)" }} />
-            <div className="relative z-10 inline-flex items-center gap-2.5 mb-4 sm:mb-6 backdrop-blur-md" style={{ padding: ".38rem .9rem .38rem .75rem", borderLeft: "2px solid #3ddc84", background: "rgba(0,0,0,.8)", color: "#3ddc84", fontSize: ".65rem", fontFamily: "var(--font-inter),monospace", fontWeight: 700, letterSpacing: ".28em", textTransform: "uppercase" }}>
-              <span className="w-1.5 h-1.5 bg-[#3ddc84] animate-status-pulse flex-shrink-0" />
-              AIML DEPARTMENT PRESENTS
-            </div>
-            <h1 className="relative z-10 uppercase leading-none animate-clockout-glow" style={{ fontFamily: "var(--font-bebas),sans-serif", fontSize: "clamp(4rem,12vw,9rem)", letterSpacing: ".06em", color: "#f2f2f0" }}>CLOCKOUT 4.0</h1>
-            <div className="relative z-10 mt-2 sm:mt-3 uppercase" style={{ fontFamily: "var(--font-oswald),sans-serif", fontSize: "clamp(.85rem,2.2vw,1.4rem)", fontWeight: 500, letterSpacing: ".28em", color: "#3ddc84", textShadow: "0 0 20px rgba(61,220,132,.5)" }}>{EVENT_CONFIG.subtitle}</div>
-            <div className="relative z-10 mt-6 sm:mt-8 max-w-2xl w-full backdrop-blur-xl" style={{ background: "rgba(8,12,9,.88)", border: "1px solid rgba(61,220,132,.18)" }}>
-              <div className="flex flex-col sm:flex-row">
-                <div className="flex items-center gap-2.5 px-4 py-3 flex-1" style={{ borderRight: "1px solid rgba(255,255,255,.06)" }}>
-                  <MapPin className="w-3.5 h-3.5 text-[#3ddc84] shrink-0" />
-                  <div><div className="text-[8px] font-mono text-[#3ddc84] tracking-[.35em] uppercase">VENUE</div><div className="text-xs font-mono text-[#e5e7eb] mt-0.5">{EVENT_CONFIG.location}</div></div>
-                </div>
-                <div className="flex items-center gap-2.5 px-4 py-3 flex-1" style={{ borderRight: "1px solid rgba(255,255,255,.06)" }}>
-                  <Calendar className="w-3.5 h-3.5 text-[#c9a227] shrink-0" />
-                  <div><div className="text-[8px] font-mono text-[#c9a227] tracking-[.35em] uppercase">DATE</div><div className="text-xs font-mono text-[#e5e7eb] mt-0.5">{EVENT_CONFIG.date}</div></div>
-                </div>
-                <div className="flex items-center gap-2.5 px-4 py-3 flex-1">
-                  <Clock className="w-3.5 h-3.5 text-[#3ddc84] shrink-0" />
-                  <div><div className="text-[8px] font-mono text-[#3ddc84] tracking-[.35em] uppercase">TIME</div><div className="text-xs font-mono text-[#e5e7eb] mt-0.5">{EVENT_CONFIG.time}</div></div>
-                </div>
-              </div>
-            </div>
-            <div className="relative z-10 mt-6 sm:mt-8 pointer-events-auto">
-              <button onClick={onRegisterClick} type="button" className="group px-10 sm:px-14 py-4 sm:py-5 bg-[#3ddc84] hover:bg-[#4ee893] text-[#050605] font-black text-sm sm:text-base tracking-[.22em] uppercase transition-all duration-200 hover:scale-[1.04] active:scale-[.98] cursor-pointer shadow-2xl" style={{ fontFamily: "var(--font-oswald),sans-serif" }}>
-                <span className="flex items-center gap-2.5">REGISTER NOW<span className="group-hover:translate-x-1.5 transition-transform">→</span></span>
-              </button>
-            </div>
           </div>
         </div>
       </section>
