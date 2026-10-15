@@ -6,10 +6,10 @@ import { Cpu, Brain, Zap, Trophy } from "lucide-react";
 
 const ICONS = [Cpu, Brain, Zap, Trophy];
 const ACCENT_COLORS = [
-  { border: "rgba(61,220,132,0.25)", glow: "rgba(61,220,132,0.12)", text: "#3ddc84", track: "TRACK 01" },
-  { border: "rgba(61,220,132,0.25)", glow: "rgba(61,220,132,0.12)", text: "#3ddc84", track: "TRACK 02" },
-  { border: "rgba(61,220,132,0.25)", glow: "rgba(61,220,132,0.12)", text: "#3ddc84", track: "TRACK 03" },
-  { border: "rgba(201,162,39,0.3)", glow: "rgba(201,162,39,0.1)", text: "#c9a227", track: "FINALE" },
+  { border: "rgba(61,220,132,0.22)", glow: "rgba(61,220,132,0.1)", text: "#3ddc84", track: "TRACK 01" },
+  { border: "rgba(61,220,132,0.22)", glow: "rgba(61,220,132,0.1)", text: "#3ddc84", track: "TRACK 02" },
+  { border: "rgba(61,220,132,0.22)", glow: "rgba(61,220,132,0.1)", text: "#3ddc84", track: "TRACK 03" },
+  { border: "rgba(201,162,39,0.28)", glow: "rgba(201,162,39,0.1)", text: "#c9a227", track: "FINALE" },
 ];
 
 export default function EventHighlights() {
@@ -54,21 +54,19 @@ export default function EventHighlights() {
           data-animate
           style={{ opacity: 0, transform: "translateY(24px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}
         >
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[#3ddc84]/30 text-[#3ddc84] text-[10px] font-mono tracking-[0.35em] uppercase mb-5 glow-emerald" style={{ background: "rgba(61,220,132,0.08)" }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3ddc84] animate-pulse" />
-            ARENA PROGRAMME
+          <div className="flex justify-center mb-5">
+            <span className="section-badge">
+              <span className="status-dot animate-status-pulse" />
+              ARENA PROGRAMME
+            </span>
           </div>
 
           <h2 className="font-cinzel font-black text-4xl sm:text-6xl tracking-[0.08em] uppercase text-[#f2f2f0]">
             Event Highlights
           </h2>
 
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <span className="h-px w-16 bg-gradient-to-r from-transparent to-[#3ddc84]/60" />
-            <span className="text-[10px] font-mono tracking-[0.4em] uppercase text-[#7bb898]">
-              ACTIVITIES & PROVING GROUNDS
-            </span>
-            <span className="h-px w-16 bg-gradient-to-l from-transparent to-[#3ddc84]/60" />
+          <div className="doom-divider mt-5 max-w-xs mx-auto">
+            <span className="doom-divider-text">ACTIVITIES & PROVING GROUNDS</span>
           </div>
         </div>
 
@@ -82,7 +80,7 @@ export default function EventHighlights() {
               <div
                 key={item.id}
                 data-animate
-                className="relative rounded-lg p-6 sm:p-8 overflow-hidden group cursor-default"
+                className="relative overflow-hidden group cursor-default"
                 style={{
                   opacity: 0,
                   transform: "translateY(32px) scale(0.97)",
@@ -90,40 +88,41 @@ export default function EventHighlights() {
                   background: "rgba(10,14,11,0.8)",
                   border: `1px solid ${accent.border}`,
                   backdropFilter: "blur(20px)",
+                  padding: "1.75rem 1.75rem",
                 }}
               >
                 {/* Ambient glow on hover */}
                 <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-lg"
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                   style={{ background: `radial-gradient(ellipse at 30% 30%, ${accent.glow} 0%, transparent 70%)` }}
                 />
 
                 {/* Top accent line */}
                 <div
                   className="absolute top-0 inset-x-0 h-px"
-                  style={{ background: `linear-gradient(90deg, transparent, ${accent.text}60, transparent)` }}
+                  style={{ background: `linear-gradient(90deg, ${accent.text}50, transparent)` }}
                 />
 
                 {/* Track identifier + Status badge */}
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2.5">
                     <div
-                      className="w-9 h-9 rounded flex items-center justify-center border transition-colors duration-300"
+                      className="w-9 h-9 flex items-center justify-center border transition-colors duration-300"
                       style={{ background: "rgba(255,255,255,0.04)", borderColor: accent.border }}
                     >
                       <Icon className="w-4 h-4" style={{ color: accent.text }} />
                     </div>
-                    <span className="text-[9px] font-mono tracking-[0.4em] uppercase" style={{ color: accent.text }}>
+                    <span className="text-[9px] font-mono tracking-[0.38em] uppercase" style={{ color: accent.text }}>
                       {accent.track} {"//"} {item.category}
                     </span>
                   </div>
 
                   <div
-                    className="px-2.5 py-1 rounded text-[9px] font-mono tracking-widest uppercase"
+                    className="px-2.5 py-1 text-[9px] font-mono tracking-widest uppercase"
                     style={{
                       background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      color: "#8a9490",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      color: "#5a7066",
                     }}
                   >
                     {item.statusBadge}
@@ -133,7 +132,6 @@ export default function EventHighlights() {
                 {/* Title */}
                 <h3
                   className="font-cinzel font-bold text-xl sm:text-2xl text-[#f2f2f0] group-hover:text-[#3ddc84] transition-colors duration-300 leading-snug mb-3"
-                  style={{ color: index === 3 ? "#f2f2f0" : undefined }}
                 >
                   {item.title}
                 </h3>
@@ -143,7 +141,7 @@ export default function EventHighlights() {
                 </p>
 
                 {/* Bottom strip */}
-                <div className="mt-6 pt-4 border-t border-white/8 flex items-center justify-between text-[10px] font-mono text-[#8a9490]">
+                <div className="mt-6 pt-4 flex items-center justify-between text-[10px] font-mono text-[#4a5e56]" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                   <span>AIML Department Proving Track</span>
                   <span
                     className="group-hover:translate-x-1 transition-transform duration-200"

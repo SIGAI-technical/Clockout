@@ -11,6 +11,8 @@ interface NavbarProps {
   showSkipIntro?: boolean;
   showReplayButton?: boolean;
   reachedRegistration?: boolean;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
 }
 
 export default function Navbar({
@@ -20,14 +22,20 @@ export default function Navbar({
   showSkipIntro = true,
   showReplayButton = false,
   reachedRegistration = false,
+  isMuted,
+  onToggleMute,
 }: NavbarProps) {
-  const [muted, setMuted] = useState(true);
+  const [internalMuted, setInternalMuted] = useState(true);
+  const effectiveMuted = isMuted !== undefined ? isMuted : internalMuted;
   const [audioCtx, setAudioCtx] = useState<AudioContext | null>(null);
   const [droneRef, setDroneRef] = useState<{ stop: () => void } | null>(null);
 
   const toggleAudio = () => {
-    if (muted) {
-      // Start drone sound
+    if (onToggleMute) {
+      onToggleMute();
+      return;
+    }
+    if (internalMuted) {
       try {
         const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
         const masterGain = ctx.createGain();
@@ -35,7 +43,6 @@ export default function Navbar({
         masterGain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 2);
         masterGain.connect(ctx.destination);
 
-        // Low drone oscillator
         const osc1 = ctx.createOscillator();
         osc1.type = "sine";
         osc1.frequency.setValueAtTime(40, ctx.currentTime);
@@ -45,7 +52,6 @@ export default function Navbar({
         g1.connect(masterGain);
         osc1.start();
 
-        // Sub-harmonic
         const osc2 = ctx.createOscillator();
         osc2.type = "sine";
         osc2.frequency.setValueAtTime(60, ctx.currentTime);
@@ -55,7 +61,6 @@ export default function Navbar({
         g2.connect(masterGain);
         osc2.start();
 
-        // Subtle texture
         const osc3 = ctx.createOscillator();
         osc3.type = "triangle";
         osc3.frequency.setValueAtTime(120, ctx.currentTime);
@@ -72,7 +77,7 @@ export default function Navbar({
             setTimeout(() => ctx.close(), 1600);
           },
         });
-        setMuted(false);
+        setInternalMuted(false);
       } catch {
         // Audio not available
       }
@@ -80,11 +85,10 @@ export default function Navbar({
       droneRef?.stop();
       setDroneRef(null);
       setAudioCtx(null);
-      setMuted(true);
+      setInternalMuted(true);
     }
   };
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (audioCtx) audioCtx.close();
@@ -98,19 +102,23 @@ export default function Navbar({
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ease-in-out ${
         isDefined
-          ? "py-3 border-b border-[#3ddc84]/15 backdrop-blur-xl bg-[rgba(5,6,5,0.92)] shadow-lg"
-          : "py-4 sm:py-5 border-b border-transparent bg-transparent backdrop-blur-none"
+          ? "py-3 backdrop-blur-xl shadow-lg"
+          : "py-4 sm:py-5 bg-transparent backdrop-blur-none"
       }`}
       style={{
-        background: isDefined ? "rgba(5,6,5,0.92)" : "transparent",
+        background: isDefined ? "rgba(5,6,5,0.94)" : "transparent",
+        borderBottom: isDefined ? "1px solid rgba(61,220,132,0.10)" : "1px solid transparent",
       }}
     >
-      <div className="w-full flex items-center justify-between">
+      <div className="w-full flex items-center justify-between px-4 sm:px-6 md:px-8">
         {/* Brand */}
-        <a href="#" className="flex items-center gap-3 group cursor-pointer select-none pl-3 sm:pl-6 md:pl-8" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
-          {/* Doom Crest Icon */}
+        <a
+          href="#"
+          className="flex items-center gap-3 group cursor-pointer select-none"
+          onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        >
           <div className="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-sm border border-[#3ddc84]/40 group-hover:border-[#3ddc84]/70 transition-colors" />
+            <div className="absolute inset-0 border border-[#3ddc84]/35 group-hover:border-[#3ddc84]/65 transition-colors" />
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="relative z-10">
               <path d="M9 1L17 15H1L9 1Z" stroke="#3ddc84" strokeWidth="1.5" fill="none"/>
               <path d="M9 5L14 14H4L9 5Z" fill="#3ddc84" opacity="0.25"/>
@@ -118,27 +126,30 @@ export default function Navbar({
             </svg>
           </div>
 
-          <div className="flex flex-col">
-            <span className="font-cinzel font-black text-xs sm:text-sm tracking-[0.18em] text-[#f2f2f0] group-hover:text-[#3ddc84] transition-colors uppercase leading-tight">
+          <div className="flex flex-col leading-none">
+            <span
+              className="text-xs sm:text-sm tracking-[0.2em] text-[#f2f2f0] group-hover:text-[#3ddc84] transition-colors uppercase"
+              style={{ fontFamily: "var(--font-bebas), 'Arial Narrow', sans-serif", fontSize: "clamp(0.85rem, 2vw, 1.1rem)", letterSpacing: "0.2em" }}
+            >
               {EVENT_CONFIG.name}
             </span>
-            <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] text-[#7bb898] uppercase leading-tight">
-              AIML DEPARTMENT
+            <span className="text-[9px] font-mono tracking-[0.28em] text-[#5a7066] uppercase mt-0.5">
+              AIML DEPT
             </span>
           </div>
         </a>
 
         {/* Controls */}
-        <div className="flex items-center gap-2 sm:gap-3 pr-3 sm:pr-6 md:pr-8">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {showSkipIntro && (
             <button
               onClick={onSkipIntro}
               type="button"
-              className="group flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-sm border border-white/15 hover:border-[#3ddc84]/50 text-[10px] sm:text-[11px] font-mono tracking-[0.2em] uppercase text-[#8a9490] hover:text-[#3ddc84] transition-all backdrop-blur-md cursor-pointer"
-              style={{ background: "rgba(0,0,0,0.45)" }}
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 border border-white/12 hover:border-[#3ddc84]/45 text-[10px] sm:text-[11px] font-mono tracking-[0.18em] uppercase text-[#6a8078] hover:text-[#3ddc84] transition-all backdrop-blur-md cursor-pointer"
+              style={{ background: "rgba(0,0,0,0.5)" }}
             >
               <FastForward className="w-3 h-3" />
-              <span className="inline font-bold">SKIP</span>
+              <span className="hidden sm:inline font-bold">SKIP</span>
             </button>
           )}
 
@@ -146,8 +157,8 @@ export default function Navbar({
             <button
               onClick={onReplayIntro}
               type="button"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-white/10 hover:border-white/25 text-[10px] font-mono tracking-wider uppercase text-[#8a9490] hover:text-[#f2f2f0] transition-all cursor-pointer"
-              style={{ background: "rgba(0,0,0,0.35)" }}
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-white/10 hover:border-white/22 text-[10px] font-mono tracking-wider uppercase text-[#6a8078] hover:text-[#f2f2f0] transition-all cursor-pointer"
+              style={{ background: "rgba(0,0,0,0.4)" }}
             >
               <RotateCcw className="w-3 h-3" />
               <span className="hidden sm:inline">REPLAY</span>
@@ -158,18 +169,18 @@ export default function Navbar({
           <button
             onClick={toggleAudio}
             type="button"
-            title={muted ? "Enable atmospheric audio" : "Disable audio"}
-            className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-sm border border-white/10 hover:border-[#3ddc84]/40 text-[#8a9490] hover:text-[#3ddc84] transition-all cursor-pointer"
-            style={{ background: "rgba(0,0,0,0.35)" }}
+            title={effectiveMuted ? "Enable atmospheric audio" : "Disable audio"}
+            className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center border border-white/10 hover:border-[#3ddc84]/38 text-[#6a8078] hover:text-[#3ddc84] transition-all cursor-pointer"
+            style={{ background: "rgba(0,0,0,0.4)" }}
           >
-            {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-[#3ddc84]" />}
+            {effectiveMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-[#3ddc84]" />}
           </button>
 
           {/* Register CTA */}
           <button
             onClick={onRegisterClick}
             type="button"
-            className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[#3ddc84] hover:bg-[#34c97a] text-[#050605] font-extrabold font-mono text-[10px] sm:text-[11px] tracking-[0.2em] uppercase rounded-sm transition-all glow-emerald hover:scale-105 cursor-pointer"
+            className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[#3ddc84] hover:bg-[#4ee893] text-[#050605] font-extrabold font-mono text-[10px] sm:text-[11px] tracking-[0.22em] uppercase transition-all glow-emerald hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
           >
             REGISTER
           </button>

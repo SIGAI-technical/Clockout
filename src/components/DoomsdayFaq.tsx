@@ -58,63 +58,68 @@ export default function DoomsdayFaq() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#3ddc84]/30 text-[#3ddc84] text-[10px] font-mono tracking-[0.35em] uppercase mb-4 glow-emerald"
-            style={{ background: "rgba(61,220,132,0.08)" }}
-          >
-            <HelpCircle className="w-3.5 h-3.5" />
-            DIRECTIVES & PROTOCOLS
+          <div className="flex justify-center mb-5">
+            <span className="section-badge">
+              <HelpCircle className="w-3 h-3" />
+              DIRECTIVES & PROTOCOLS
+            </span>
           </div>
 
           <h2 className="font-cinzel font-black text-3xl sm:text-5xl uppercase text-[#f2f2f0] leading-tight">
             Frequently Asked Directives
           </h2>
 
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <span className="h-px w-16 bg-gradient-to-r from-transparent to-[#3ddc84]/60" />
-            <span className="text-[10px] font-mono tracking-[0.4em] uppercase text-[#7bb898]">
-              LATVERIAN CODE OF CONDUCT & RULES
-            </span>
-            <span className="h-px w-16 bg-gradient-to-l from-transparent to-[#3ddc84]/60" />
+          <div className="doom-divider mt-5 max-w-xs mx-auto">
+            <span className="doom-divider-text">LATVERIAN CODE OF CONDUCT & RULES</span>
           </div>
         </div>
 
         {/* FAQ Accordion List */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {FAQS.map((faq, i) => {
             const isOpen = openIndex === i;
             return (
               <div
                 key={faq.code}
-                className={`rounded-lg border transition-all duration-200 overflow-hidden ${
-                  isOpen
-                    ? "border-[#3ddc84]/40 bg-[#0c130e]"
-                    : "border-white/10 bg-[#080b09]/80 hover:border-white/20"
-                }`}
+                className="overflow-hidden transition-all duration-200"
+                style={{
+                  border: isOpen
+                    ? "1px solid rgba(61,220,132,0.38)"
+                    : "1px solid rgba(255,255,255,0.08)",
+                  background: isOpen ? "rgba(12,19,14,0.95)" : "rgba(8,11,9,0.82)",
+                }}
               >
                 <button
                   onClick={() => toggle(i)}
                   type="button"
                   className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-mono text-[#3ddc84] font-bold tracking-wider">
+                  <div className="flex items-center gap-3.5">
+                    <span className="text-[9px] font-mono text-[#3ddc84] font-black tracking-[0.3em] flex-shrink-0">
                       {faq.code}
                     </span>
-                    <span className="font-cinzel font-bold text-base sm:text-lg text-[#f2f2f0]">
+                    <span className="font-cinzel font-bold text-sm sm:text-base text-[#f2f2f0] leading-snug">
                       {faq.question}
                     </span>
                   </div>
 
-                  <ChevronDown
-                    className={`w-4 h-4 text-[#7bb898] transition-transform duration-200 shrink-0 ${
-                      isOpen ? "rotate-180 text-[#3ddc84]" : ""
-                    }`}
-                  />
+                  <div
+                    className="w-6 h-6 flex items-center justify-center flex-shrink-0 border transition-all duration-200"
+                    style={{
+                      borderColor: isOpen ? "rgba(61,220,132,0.4)" : "rgba(255,255,255,0.1)",
+                      background: isOpen ? "rgba(61,220,132,0.08)" : "transparent",
+                    }}
+                  >
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                        isOpen ? "rotate-180 text-[#3ddc84]" : "text-[#5a7066]"
+                      }`}
+                    />
+                  </div>
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 sm:px-6 pb-6 text-sm text-[#a3a8a4] leading-relaxed border-t border-white/5 pt-4">
+                  <div className="px-5 sm:px-6 pb-6 text-sm text-[#a3a8a4] leading-relaxed pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
                     <p>{faq.answer}</p>
                   </div>
                 )}

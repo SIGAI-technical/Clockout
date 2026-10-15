@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Cinzel, Inter } from "next/font/google";
+import { Bebas_Neue, Inter, Oswald } from "next/font/google";
 import "./globals.css";
 
-const cinzel = Cinzel({
-  variable: "--font-cinzel",
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400"],
+  display: "swap",
+});
+
+const oswald = Oswald({
+  variable: "--font-oswald",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -57,7 +64,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${cinzel.variable} ${inter.variable} dark`}>
+    <html lang="en" className={`${bebasNeue.variable} ${oswald.variable} ${inter.variable} dark`}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } window.scrollTo(0, 0);`,
+          }}
+        />
+      </head>
       <body className="bg-[#050605] text-[#F7F7F6] antialiased selection:bg-[#39D98A]/30 selection:text-[#39D98A] overflow-x-hidden min-h-screen">
         {children}
       </body>

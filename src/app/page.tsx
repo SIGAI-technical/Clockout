@@ -11,6 +11,7 @@ import { EVENT_CONFIG } from "@/config/event";
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cinematicCompleted, setCinematicCompleted] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const cinematicRef = useRef<CinematicScrollHandle>(null);
 
   const handleRegisterClick = useCallback(() => {
@@ -42,6 +43,10 @@ export default function Home() {
     }
   }, []);
 
+  const handleToggleMute = useCallback(() => {
+    setIsMuted((prev) => !prev);
+  }, []);
+
   return (
     <main className="relative min-h-screen w-full bg-[#000000] text-[#F7F7F6] overflow-x-hidden">
       {/* Permanent Background Throne (Doctor Doom Frozen Final Frame) */}
@@ -55,6 +60,8 @@ export default function Home() {
         showSkipIntro={!cinematicCompleted}
         showReplayButton={cinematicCompleted}
         reachedRegistration={cinematicCompleted}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
       />
 
       {/* Primary Cinematic Sequence (Videos 1, 2, 3 + Transitions 1, 2 + Throne Reveal + Event Details) */}
@@ -62,6 +69,7 @@ export default function Home() {
         ref={cinematicRef}
         onRegisterClick={handleRegisterClick}
         onCinematicComplete={handleCinematicComplete}
+        isMuted={isMuted}
       />
 
       {/* Minimalist Footer */}

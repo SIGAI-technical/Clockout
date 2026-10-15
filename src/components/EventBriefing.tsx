@@ -85,21 +85,19 @@ export default function EventBriefing({ onRegisterClick }: EventBriefingProps) {
           data-animate
           style={{ opacity: 0, transform: "translateY(24px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}
         >
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[#3ddc84]/30 text-[#3ddc84] text-[10px] font-mono tracking-[0.35em] uppercase mb-5 glow-emerald" style={{ background: "rgba(61,220,132,0.08)" }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#3ddc84] animate-pulse" />
-            OFFICIAL PROCLAMATION
+          <div className="flex justify-center mb-5">
+            <span className="section-badge">
+              <span className="status-dot animate-status-pulse" />
+              OFFICIAL PROCLAMATION
+            </span>
           </div>
 
           <h2 className="font-cinzel font-black text-4xl sm:text-6xl tracking-[0.08em] uppercase text-[#f2f2f0] leading-tight">
             The Event Briefing
           </h2>
 
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <span className="h-px w-16 bg-gradient-to-r from-transparent to-[#3ddc84]/60" />
-            <span className="text-[10px] font-mono tracking-[0.4em] uppercase text-[#7bb898]">
-              LATVERIAN PROTOCOL DIRECTIVE
-            </span>
-            <span className="h-px w-16 bg-gradient-to-l from-transparent to-[#3ddc84]/60" />
+          <div className="doom-divider mt-5 max-w-xs mx-auto">
+            <span className="doom-divider-text">LATVERIAN PROTOCOL DIRECTIVE</span>
           </div>
 
           <p className="mt-6 text-sm sm:text-base text-[#8a9490] leading-relaxed max-w-2xl mx-auto">
@@ -116,25 +114,30 @@ export default function EventBriefing({ onRegisterClick }: EventBriefingProps) {
               <div
                 key={card.label}
                 data-animate
-                className="glass-panel glass-panel-hover rounded-lg p-5 sm:p-6 relative overflow-hidden"
+                className="glass-panel glass-panel-hover relative overflow-hidden"
                 style={{
                   opacity: 0,
                   transform: "translateY(24px)",
                   transition: `opacity 0.7s ease ${i * 0.08}s, transform 0.7s ease ${i * 0.08}s, border-color 0.3s, box-shadow 0.3s`,
+                  padding: "1.4rem 1.25rem",
                 }}
               >
-                {/* Corner accent */}
+                {/* Top left accent bar */}
                 <div
-                  className="absolute top-0 right-0 w-16 h-16 rounded-bl-full opacity-30"
-                  style={{ background: isGold ? "rgba(201,162,39,0.15)" : "rgba(61,220,132,0.12)" }}
+                  className="absolute top-0 left-0 right-0 h-px"
+                  style={{
+                    background: isGold
+                      ? "linear-gradient(90deg, #c9a22760, transparent)"
+                      : "linear-gradient(90deg, #3ddc8460, transparent)",
+                  }}
                 />
 
                 <div className="flex items-center justify-between mb-4">
-                  <span className={`text-[9px] font-mono tracking-[0.35em] uppercase ${isGold ? "text-[#c9a227]" : "text-[#7bb898]"}`}>
+                  <span className={`text-[9px] font-mono tracking-[0.38em] uppercase ${isGold ? "text-[#c9a227]" : "text-[#3ddc84]"}`}>
                     {card.label}
                   </span>
                   <div
-                    className="w-7 h-7 rounded flex items-center justify-center border"
+                    className="w-7 h-7 flex items-center justify-center border"
                     style={{
                       background: "rgba(255,255,255,0.04)",
                       borderColor: isGold ? "rgba(201,162,39,0.25)" : "rgba(61,220,132,0.2)",
@@ -147,15 +150,13 @@ export default function EventBriefing({ onRegisterClick }: EventBriefingProps) {
                   </div>
                 </div>
 
-                <div className="text-[10px] font-mono text-[#8a9490] uppercase tracking-wider mb-1">{card.sub}</div>
-                <div
-                  className="text-xl sm:text-2xl font-black font-cinzel text-[#f2f2f0] leading-tight"
-                >
+                <div className="text-[9px] font-mono text-[#5a7066] uppercase tracking-wider mb-1">{card.sub}</div>
+                <div className="text-xl sm:text-2xl font-black font-cinzel text-[#f2f2f0] leading-tight">
                   {card.value}
                 </div>
                 <div
                   className="mt-2 text-[10px] font-mono"
-                  style={{ color: isGold ? "#c9a227" : "#7bb898" }}
+                  style={{ color: isGold ? "#c9a22799" : "#7bb898" }}
                 >
                   {card.detail}
                 </div>
@@ -167,8 +168,14 @@ export default function EventBriefing({ onRegisterClick }: EventBriefingProps) {
         {/* ── Sovereign Decree Banner ── */}
         <div
           data-animate
-          className="glass-panel rounded-xl p-8 sm:p-10 relative overflow-hidden border border-[#3ddc84]/20"
-          style={{ opacity: 0, transform: "translateY(24px)", transition: "opacity 0.7s ease 0.32s, transform 0.7s ease 0.32s" }}
+          className="glass-panel relative overflow-hidden"
+          style={{
+            opacity: 0,
+            transform: "translateY(24px)",
+            transition: "opacity 0.7s ease 0.32s, transform 0.7s ease 0.32s",
+            padding: "2rem 2.5rem",
+            borderColor: "rgba(61,220,132,0.2)",
+          }}
         >
           {/* Emerald ambient blob */}
           <div className="absolute -top-10 -right-10 w-52 h-52 rounded-full blur-[80px] pointer-events-none" style={{ background: "rgba(61,220,132,0.08)" }} />
@@ -196,7 +203,7 @@ export default function EventBriefing({ onRegisterClick }: EventBriefingProps) {
               <button
                 onClick={onRegisterClick}
                 type="button"
-                className="group flex items-center gap-2 px-6 py-3 bg-[#3ddc84] hover:bg-[#34c97a] text-[#050605] font-extrabold font-mono text-[11px] tracking-[0.2em] uppercase rounded-sm transition-all glow-emerald hover:scale-105 cursor-pointer"
+                className="group flex items-center gap-2 px-6 py-3 bg-[#3ddc84] hover:bg-[#4ee893] text-[#050605] font-extrabold font-mono text-[11px] tracking-[0.2em] uppercase transition-all glow-emerald hover:scale-105 cursor-pointer"
               >
                 REGISTER NOW
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -204,7 +211,7 @@ export default function EventBriefing({ onRegisterClick }: EventBriefingProps) {
 
               <a
                 href="#event-highlights"
-                className="flex items-center gap-2 px-5 py-3 rounded-sm border border-white/15 hover:border-[#3ddc84]/40 text-[11px] font-mono tracking-wider uppercase text-[#8a9490] hover:text-[#f2f2f0] transition-all"
+                className="flex items-center gap-2 px-5 py-3 border border-white/12 hover:border-[#3ddc84]/38 text-[11px] font-mono tracking-wider uppercase text-[#6a8078] hover:text-[#f2f2f0] transition-all"
                 style={{ background: "rgba(255,255,255,0.03)" }}
               >
                 View Highlights

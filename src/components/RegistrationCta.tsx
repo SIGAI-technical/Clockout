@@ -50,42 +50,50 @@ export default function RegistrationCta({ onRegisterClick }: RegistrationCtaProp
     >
       <div className="max-w-4xl mx-auto">
         <div
-          className="relative rounded-2xl overflow-hidden text-center"
+          className="relative overflow-hidden text-center"
           data-animate
           style={{
             opacity: 0,
             transform: "translateY(32px)",
             transition: "opacity 0.8s ease, transform 0.8s ease",
-            background: "rgba(8,12,9,0.88)",
-            border: "1px solid rgba(61,220,132,0.22)",
+            background: "rgba(8,12,9,0.92)",
+            border: "1px solid rgba(61,220,132,0.2)",
             backdropFilter: "blur(24px)",
           }}
         >
           {/* Ambient emerald backlight */}
-          <div className="absolute inset-0 pointer-events-none" style={{
-            background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(61,220,132,0.07) 0%, transparent 70%)",
-          }} />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(61,220,132,0.06) 0%, transparent 70%)",
+            }}
+          />
 
-          {/* Top gold accent line */}
-          <div className="absolute top-0 inset-x-0 h-px" style={{
-            background: "linear-gradient(90deg, transparent, rgba(201,162,39,0.6), rgba(61,220,132,0.6), transparent)",
-          }} />
+          {/* Top accent line */}
+          <div
+            className="absolute top-0 inset-x-0 h-px"
+            style={{
+              background: "linear-gradient(90deg, transparent, rgba(201,162,39,0.55), rgba(61,220,132,0.55), transparent)",
+            }}
+          />
 
-          {/* Corner decorations */}
-          <div className="absolute top-6 left-6 w-12 h-12 border-l-2 border-t-2 border-[#3ddc84]/30 rounded-tl-sm pointer-events-none" />
-          <div className="absolute top-6 right-6 w-12 h-12 border-r-2 border-t-2 border-[#3ddc84]/30 rounded-tr-sm pointer-events-none" />
-          <div className="absolute bottom-6 left-6 w-12 h-12 border-l-2 border-b-2 border-[#c9a227]/30 rounded-bl-sm pointer-events-none" />
-          <div className="absolute bottom-6 right-6 w-12 h-12 border-r-2 border-b-2 border-[#c9a227]/30 rounded-br-sm pointer-events-none" />
+          {/* Corner brackets */}
+          <div className="absolute top-5 left-5 w-10 h-10 border-l-2 border-t-2 border-[#3ddc84]/28 pointer-events-none" />
+          <div className="absolute top-5 right-5 w-10 h-10 border-r-2 border-t-2 border-[#3ddc84]/28 pointer-events-none" />
+          <div className="absolute bottom-5 left-5 w-10 h-10 border-l-2 border-b-2 border-[#c9a227]/22 pointer-events-none" />
+          <div className="absolute bottom-5 right-5 w-10 h-10 border-r-2 border-b-2 border-[#c9a227]/22 pointer-events-none" />
 
           <div className="relative z-10 px-8 sm:px-14 py-14 sm:py-16">
             {/* Status badge */}
-            <div
-              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-[#3ddc84]/35 text-[#3ddc84] text-[10px] font-mono tracking-[0.35em] uppercase mb-7 glow-emerald"
-              data-animate
-              style={{ opacity: 0, transform: "translateY(16px)", transition: "opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s", background: "rgba(61,220,132,0.1)" }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3ddc84] animate-pulse" />
-              PORTAL READY — ACCESS PROTOCOL
+            <div className="flex justify-center mb-7">
+              <span
+                className="section-badge"
+                data-animate
+                style={{ opacity: 0, transform: "translateY(16px)", transition: "opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s" }}
+              >
+                <span className="status-dot animate-status-pulse" />
+                PORTAL READY — ACCESS PROTOCOL
+              </span>
             </div>
 
             <h2
@@ -125,7 +133,7 @@ export default function RegistrationCta({ onRegisterClick }: RegistrationCtaProp
                   href={formUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-3 px-10 sm:px-14 py-4 sm:py-5 bg-[#3ddc84] hover:bg-[#34c97a] text-[#050605] font-black font-mono text-sm sm:text-base tracking-[0.2em] uppercase rounded-sm glow-emerald-lg hover:scale-105 transition-all duration-200 cursor-pointer"
+                  className="group inline-flex items-center gap-3 px-10 sm:px-14 py-4 sm:py-5 bg-[#3ddc84] hover:bg-[#4ee893] text-[#050605] font-black font-mono text-sm sm:text-base tracking-[0.2em] uppercase glow-emerald-lg hover:scale-105 transition-all duration-200 cursor-pointer"
                 >
                   REGISTER NOW
                   <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -134,7 +142,7 @@ export default function RegistrationCta({ onRegisterClick }: RegistrationCtaProp
                 <button
                   onClick={onRegisterClick}
                   type="button"
-                  className="group inline-flex items-center gap-3 px-10 sm:px-14 py-4 sm:py-5 bg-[#3ddc84] hover:bg-[#34c97a] text-[#050605] font-black font-mono text-sm sm:text-base tracking-[0.2em] uppercase rounded-sm glow-emerald-lg hover:scale-105 transition-all duration-200 cursor-pointer"
+                  className="group inline-flex items-center gap-3 px-10 sm:px-14 py-4 sm:py-5 bg-[#3ddc84] hover:bg-[#4ee893] text-[#050605] font-black font-mono text-sm sm:text-base tracking-[0.2em] uppercase glow-emerald-lg hover:scale-105 transition-all duration-200 cursor-pointer"
                 >
                   REGISTER NOW
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -142,7 +150,7 @@ export default function RegistrationCta({ onRegisterClick }: RegistrationCtaProp
               )}
 
               {!isUrlConfigured && (
-                <div className="flex items-center gap-2 text-[10px] font-mono text-[#7bb898]">
+                <div className="flex items-center gap-2 text-[10px] font-mono text-[#5a7066]">
                   <ShieldAlert className="w-3.5 h-3.5 text-[#3ddc84]" />
                   Google Form link will be attached directly by organizers
                 </div>
@@ -151,9 +159,9 @@ export default function RegistrationCta({ onRegisterClick }: RegistrationCtaProp
 
             {/* Quick info strip */}
             <div
-              className="mt-12 pt-7 border-t border-white/8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-[11px] font-mono text-[#8a9490]"
+              className="mt-12 pt-7 grid grid-cols-1 sm:grid-cols-3 gap-4 text-[11px] font-mono text-[#6a8078]"
               data-animate
-              style={{ opacity: 0, transform: "translateY(12px)", transition: "opacity 0.7s ease 0.54s, transform 0.7s ease 0.54s" }}
+              style={{ opacity: 0, transform: "translateY(12px)", transition: "opacity 0.7s ease 0.54s, transform 0.7s ease 0.54s", borderTop: "1px solid rgba(255,255,255,0.07)" }}
             >
               <div className="flex items-center justify-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-[#3ddc84]" />

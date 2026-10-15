@@ -94,24 +94,19 @@ export default function LatverianVault() {
           data-animate
           style={{ opacity: 0, transform: "translateY(24px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}
         >
-          <div
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[#c9a227]/30 text-[#c9a227] text-[10px] font-mono tracking-[0.35em] uppercase mb-5 glow-gold"
-            style={{ background: "rgba(201,162,39,0.08)" }}
-          >
-            <Trophy className="w-3.5 h-3.5 text-[#c9a227]" />
-            SOVEREIGN ACCLAIM & RECOGNITION
+          <div className="flex justify-center mb-5">
+            <span className="section-badge section-badge-gold">
+              <Trophy className="w-3 h-3" />
+              SOVEREIGN ACCLAIM & RECOGNITION
+            </span>
           </div>
 
           <h2 className="font-cinzel font-black text-4xl sm:text-6xl tracking-[0.08em] uppercase text-[#f2f2f0] leading-tight">
             The Latverian Vault
           </h2>
 
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <span className="h-px w-16 bg-gradient-to-r from-transparent to-[#c9a227]/60" />
-            <span className="text-[10px] font-mono tracking-[0.4em] uppercase text-[#c9a227]">
-              HONORS DECREED BY DOOM
-            </span>
-            <span className="h-px w-16 bg-gradient-to-l from-transparent to-[#c9a227]/60" />
+          <div className="doom-divider mt-5 max-w-xs mx-auto" style={{ "--divider-color": "#c9a227" } as React.CSSProperties}>
+            <span className="doom-divider-text" style={{ color: "#7a6020" }}>HONORS DECREED BY DOOM</span>
           </div>
         </div>
 
@@ -121,35 +116,46 @@ export default function LatverianVault() {
             <div
               key={reward.title}
               data-animate
-              className={`relative rounded-xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden group transition-all duration-300 ${
+              className={`relative flex flex-col justify-between overflow-hidden group transition-all duration-300 ${
                 reward.isGrandPrize
-                  ? "border-2 border-[#c9a227]/60 bg-gradient-to-b from-[#141005] via-[#0d0f0c] to-[#070907] shadow-2xl glow-gold md:-translate-y-2"
-                  : "border border-[#3ddc84]/20 bg-[#0a0d0b]/80 hover:border-[#3ddc84]/50 hover:bg-[#0c120e]"
+                  ? "shadow-2xl glow-gold md:-translate-y-2"
+                  : "hover:border-[#3ddc84]/45"
               }`}
               style={{
                 opacity: 0,
                 transform: "translateY(30px)",
                 transition: `opacity 0.7s ease ${i * 0.12}s, transform 0.7s ease ${i * 0.12}s, border-color 0.3s, background 0.3s`,
                 backdropFilter: "blur(20px)",
+                padding: "1.75rem",
+                border: reward.isGrandPrize
+                  ? "1px solid rgba(201,162,39,0.55)"
+                  : "1px solid rgba(61,220,132,0.18)",
+                background: reward.isGrandPrize
+                  ? "linear-gradient(160deg, rgba(20,16,5,0.97) 0%, rgba(13,15,12,0.97) 100%)"
+                  : "rgba(10,13,11,0.82)",
               }}
             >
-              {/* Grand prize banner */}
+              {/* Grand prize top bar */}
               {reward.isGrandPrize && (
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#c9a227] to-transparent" />
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#c9a227] to-transparent" />
               )}
 
               <div>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-5">
                   <span
-                    className={`text-[9px] font-mono px-3 py-1 rounded-full uppercase tracking-wider font-bold ${
-                      reward.isGrandPrize
-                        ? "bg-[#c9a227] text-[#050605]"
-                        : "bg-[#3ddc84]/15 text-[#3ddc84] border border-[#3ddc84]/30"
-                    }`}
+                    className="text-[9px] font-mono px-3 py-1.5 uppercase tracking-wider font-black"
+                    style={{
+                      background: reward.isGrandPrize ? "#c9a227" : "rgba(61,220,132,0.12)",
+                      color: reward.isGrandPrize ? "#050605" : "#3ddc84",
+                      border: reward.isGrandPrize ? "none" : "1px solid rgba(61,220,132,0.28)",
+                    }}
                   >
                     {reward.rank}
                   </span>
-                  <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center">
+                  <div
+                    className="w-8 h-8 border flex items-center justify-center"
+                    style={{ borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}
+                  >
                     {reward.isGrandPrize ? (
                       <Trophy className="w-4 h-4 text-[#c9a227]" />
                     ) : (
@@ -158,25 +164,28 @@ export default function LatverianVault() {
                   </div>
                 </div>
 
-                <h3 className="font-cinzel font-black text-2xl text-[#f2f2f0] mb-1">
+                <h3 className="font-cinzel font-black text-xl sm:text-2xl text-[#f2f2f0] mb-1">
                   {reward.title}
                 </h3>
 
-                <p className="text-[10px] font-mono text-[#8a9490] tracking-wider uppercase mb-6">
+                <p className="text-[9px] font-mono text-[#5a7066] tracking-wider uppercase mb-6">
                   {reward.category}
                 </p>
 
-                <div className="space-y-3 border-t border-white/10 pt-5 mb-8">
+                <div className="space-y-3 mb-8" style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "1.25rem" }}>
                   {reward.perks.map((perk, pIdx) => (
-                    <div key={pIdx} className="flex items-start gap-2.5 text-xs text-[#d1d5db]">
-                      <span className="text-[#3ddc84] mt-0.5">•</span>
+                    <div key={pIdx} className="flex items-start gap-2.5 text-xs text-[#c8ccc9]">
+                      <span
+                        className="w-1 h-1 mt-1.5 flex-shrink-0"
+                        style={{ background: reward.isGrandPrize ? "#c9a227" : "#3ddc84" }}
+                      />
                       <span>{perk}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-white/5 text-[10px] font-mono text-[#8a9490] tracking-widest uppercase flex items-center gap-2">
+              <div className="pt-4 text-[9px] font-mono text-[#4a5e56] tracking-widest uppercase flex items-center gap-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
                 <Sparkles className="w-3 h-3 text-[#c9a227]" />
                 <span>LATVERIAN CERTIFIED RECORD</span>
               </div>

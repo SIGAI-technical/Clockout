@@ -47,6 +47,12 @@ const PHASES: TimelinePhase[] = [
   },
 ];
 
+const STATUS_COLORS: Record<string, string> = {
+  SCHEDULED: "#3ddc84",
+  UPCOMING: "#c9a227",
+  CLASSIFIED: "#8a9490",
+};
+
 export default function DoomsdayTimeline() {
   const sectionRef = useRef<HTMLElement>(null);
   const [activePhaseIndex, setActivePhaseIndex] = useState(0);
@@ -90,75 +96,76 @@ export default function DoomsdayTimeline() {
           data-animate
           style={{ opacity: 0, transform: "translateY(24px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}
         >
-          <div
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[#3ddc84]/30 text-[#3ddc84] text-[10px] font-mono tracking-[0.35em] uppercase mb-5 glow-emerald"
-            style={{ background: "rgba(61,220,132,0.08)" }}
-          >
-            <Clock className="w-3.5 h-3.5 text-[#3ddc84]" />
-            MISSION CHRONOLOGY
+          <div className="flex justify-center mb-5">
+            <span className="section-badge">
+              <Clock className="w-3 h-3" />
+              MISSION CHRONOLOGY
+            </span>
           </div>
 
           <h2 className="font-cinzel font-black text-4xl sm:text-6xl tracking-[0.08em] uppercase text-[#f2f2f0] leading-tight">
             The Takeover Protocol
           </h2>
 
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <span className="h-px w-16 bg-gradient-to-r from-transparent to-[#3ddc84]/60" />
-            <span className="text-[10px] font-mono tracking-[0.4em] uppercase text-[#7bb898]">
-              {EVENT_CONFIG.location} • {EVENT_CONFIG.time}
-            </span>
-            <span className="h-px w-16 bg-gradient-to-l from-transparent to-[#3ddc84]/60" />
+          <div className="doom-divider mt-5 max-w-xs mx-auto">
+            <span className="doom-divider-text">{EVENT_CONFIG.location} • {EVENT_CONFIG.time}</span>
           </div>
         </div>
 
-        {/* Interactive Phase Selector for Mobile & Desktop */}
+        {/* Interactive Phase Selector */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Phase Navigation Tabs (Left 4 cols) */}
+          {/* Phase Navigation Tabs */}
           <div className="lg:col-span-5 flex flex-col gap-3">
             {PHASES.map((p, idx) => {
               const isActive = activePhaseIndex === idx;
+              const statusColor = STATUS_COLORS[p.status] || "#8a9490";
               return (
                 <button
                   key={p.codename}
                   onClick={() => setActivePhaseIndex(idx)}
                   type="button"
                   data-animate
-                  className={`text-left p-5 sm:p-6 rounded-lg border transition-all duration-300 relative overflow-hidden cursor-pointer ${
+                  className={`text-left relative overflow-hidden cursor-pointer transition-all duration-300 ${
                     isActive
-                      ? "border-[#3ddc84]/50 bg-[#0c140e] shadow-xl glow-emerald"
-                      : "border-white/10 bg-[#090c0a]/60 hover:border-white/25 hover:bg-[#090c0a]"
+                      ? "shadow-xl"
+                      : "hover:bg-[#090c0a]"
                   }`}
                   style={{
                     opacity: 0,
+                    padding: "1.25rem 1.4rem",
                     transform: "translateY(20px)",
                     transition: `opacity 0.6s ease ${idx * 0.1}s, transform 0.6s ease ${idx * 0.1}s, border-color 0.2s, background 0.2s`,
+                    border: isActive ? "1px solid rgba(61,220,132,0.45)" : "1px solid rgba(255,255,255,0.08)",
+                    background: isActive ? "rgba(12,20,14,0.95)" : "rgba(9,12,10,0.65)",
+                    boxShadow: isActive ? "0 0 40px -15px rgba(61,220,132,0.35)" : "none",
                   }}
                 >
                   {/* Left accent indicator */}
                   {isActive && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#3ddc84] to-[#c9a227]" />
+                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#3ddc84] to-[#c9a227]" />
                   )}
 
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-[#3ddc84]">
+                    <span className="text-[9px] font-mono tracking-[0.32em] uppercase text-[#3ddc84]">
                       {p.phase} {"//"} {p.codename}
                     </span>
                     <span
-                      className={`text-[9px] font-mono px-2 py-0.5 rounded-xs uppercase tracking-wider ${
-                        isActive
-                          ? "bg-[#3ddc84]/20 text-[#3ddc84] border border-[#3ddc84]/40"
-                          : "bg-white/5 text-[#8a9490]"
-                      }`}
+                      className="text-[9px] font-mono px-2 py-0.5 uppercase tracking-wider border"
+                      style={{
+                        color: statusColor,
+                        borderColor: `${statusColor}40`,
+                        background: `${statusColor}10`,
+                      }}
                     >
                       {p.status}
                     </span>
                   </div>
 
-                  <h3 className="font-cinzel font-bold text-lg text-[#f2f2f0] mb-2 leading-snug">
+                  <h3 className="font-cinzel font-bold text-base sm:text-lg text-[#f2f2f0] mb-2 leading-snug">
                     {p.title}
                   </h3>
 
-                  <div className="flex items-center gap-2 text-xs font-mono text-[#8a9490]">
+                  <div className="flex items-center gap-2 text-xs font-mono text-[#5a7066]">
                     <Clock className="w-3.5 h-3.5 text-[#c9a227]" />
                     <span>{p.timeRange}</span>
                   </div>
@@ -167,15 +174,18 @@ export default function DoomsdayTimeline() {
             })}
           </div>
 
-          {/* Active Phase Deep Dive Card (Right 7 cols) */}
+          {/* Active Phase Deep Dive Card */}
           <div
-            className="lg:col-span-7 relative p-6 sm:p-10 rounded-xl border border-[#3ddc84]/25 backdrop-blur-xl overflow-hidden"
+            className="lg:col-span-7 relative overflow-hidden"
             style={{
-              background: "rgba(10,15,11,0.85)",
+              background: "rgba(10,15,11,0.88)",
+              border: "1px solid rgba(61,220,132,0.2)",
               boxShadow: "0 20px 50px rgba(0,0,0,0.6)",
+              backdropFilter: "blur(20px)",
+              padding: "2rem 2.25rem",
             }}
           >
-            {/* Top accent glow */}
+            {/* Top accent */}
             <div
               className="absolute top-0 inset-x-0 h-px"
               style={{
@@ -183,29 +193,29 @@ export default function DoomsdayTimeline() {
               }}
             />
 
-            {/* Tactical watermarking */}
+            {/* Tactical watermark */}
             <div className="absolute right-4 bottom-4 text-[4rem] sm:text-[6rem] font-black font-cinzel text-white/[0.02] select-none pointer-events-none">
               0{activePhaseIndex + 1}
             </div>
 
             <div className="flex items-center gap-3 mb-6">
               <div
-                className="w-10 h-10 rounded-sm border border-[#3ddc84]/40 flex items-center justify-center text-[#3ddc84]"
-                style={{ background: "rgba(61,220,132,0.1)" }}
+                className="w-10 h-10 border border-[#3ddc84]/38 flex items-center justify-center text-[#3ddc84]"
+                style={{ background: "rgba(61,220,132,0.08)" }}
               >
                 <Terminal className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-[#3ddc84]">
+                <span className="text-[9px] font-mono tracking-[0.32em] uppercase text-[#3ddc84] block">
                   DIRECTIVE DOSSIER
                 </span>
-                <h4 className="font-cinzel font-black text-2xl sm:text-3xl text-[#f2f2f0]">
+                <h4 className="font-cinzel font-black text-xl sm:text-2xl text-[#f2f2f0] mt-0.5">
                   {PHASES[activePhaseIndex].title}
                 </h4>
               </div>
             </div>
 
-            <div className="p-4 rounded-sm border border-white/5 bg-black/40 mb-6 font-mono text-xs text-[#7bb898] flex items-center gap-3">
+            <div className="p-4 border border-white/5 bg-black/40 mb-6 font-mono text-xs text-[#7bb898] flex items-center gap-3">
               <span className="text-[#c9a227] font-bold">TIMING:</span>
               <span>{PHASES[activePhaseIndex].timeRange}</span>
               <span className="text-white/20">•</span>
@@ -217,18 +227,18 @@ export default function DoomsdayTimeline() {
               {PHASES[activePhaseIndex].summary}
             </p>
 
-            {/* Deliverables Checklist */}
-            <div className="border-t border-white/10 pt-6">
-              <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-[#c9a227] block mb-4">
+            {/* Deliverables */}
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "1.5rem" }}>
+              <span className="text-[9px] font-mono tracking-[0.32em] uppercase text-[#c9a227] block mb-4">
                 CORE PROTOCOL OBJECTIVES
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {PHASES[activePhaseIndex].deliverables.map((item, i) => (
                   <div
                     key={i}
-                    className="p-3 rounded-sm border border-white/8 bg-white/[0.02] flex items-center gap-2 text-xs font-mono text-[#f2f2f0]"
+                    className="p-3 border border-white/6 bg-white/[0.02] flex items-center gap-2 text-xs font-mono text-[#d1d5db]"
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3ddc84]" />
+                    <span className="w-1.5 h-1.5 bg-[#3ddc84] flex-shrink-0" />
                     <span>{item}</span>
                   </div>
                 ))}

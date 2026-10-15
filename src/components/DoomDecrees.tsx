@@ -50,6 +50,8 @@ export default function DoomDecrees() {
     return () => clearInterval(timer);
   }, []);
 
+  const isGold = DECREES[index].theme === "GOLD";
+
   return (
     <section
       ref={sectionRef}
@@ -58,15 +60,18 @@ export default function DoomDecrees() {
     >
       <div className="max-w-4xl mx-auto">
         <div
-          className="relative rounded-xl p-8 sm:p-12 border border-[#3ddc84]/30 overflow-hidden shadow-2xl"
+          className="relative overflow-hidden shadow-2xl"
           style={{
-            background: "linear-gradient(135deg, rgba(10,18,13,0.92) 0%, rgba(5,8,6,0.96) 100%)",
+            background: "linear-gradient(135deg, rgba(10,18,13,0.94) 0%, rgba(5,8,6,0.97) 100%)",
             backdropFilter: "blur(24px)",
+            border: `1px solid ${isGold ? "rgba(201,162,39,0.28)" : "rgba(61,220,132,0.28)"}`,
+            padding: "2rem 2.5rem 1.75rem",
+            transition: "border-color 0.5s ease",
           }}
         >
-          {/* Subtle Latverian Mask Watermark */}
-          <div className="absolute -right-8 -bottom-8 opacity-5 select-none pointer-events-none">
-            <svg width="240" height="240" viewBox="0 0 100 100" fill="currentColor" className="text-[#3ddc84]">
+          {/* Subtle Doom Mask Watermark */}
+          <div className="absolute -right-8 -bottom-8 opacity-[0.04] select-none pointer-events-none">
+            <svg width="240" height="240" viewBox="0 0 100 100" fill="currentColor" className={isGold ? "text-[#c9a227]" : "text-[#3ddc84]"}>
               <polygon points="50,5 90,30 80,85 50,95 20,85 10,30" stroke="currentColor" strokeWidth="2" fill="none" />
               <rect x="25" y="40" width="18" height="8" rx="2" fill="currentColor" />
               <rect x="57" y="40" width="18" height="8" rx="2" fill="currentColor" />
@@ -75,10 +80,13 @@ export default function DoomDecrees() {
           </div>
 
           {/* Top Bar HUD */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#3ddc84] animate-ping" />
-              <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-[#3ddc84]">
+          <div className="flex items-center justify-between pb-4 mb-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="flex items-center gap-2.5">
+              <span
+                className="status-dot animate-status-pulse"
+                style={{ background: isGold ? "#c9a227" : "#3ddc84" }}
+              />
+              <span className={`text-[10px] font-mono tracking-[0.28em] uppercase ${isGold ? "text-[#c9a227]" : "text-[#3ddc84]"}`}>
                 LATVERIAN HOLO-TRANSMISSION // ENCRYPTED
               </span>
             </div>
@@ -86,7 +94,8 @@ export default function DoomDecrees() {
             <button
               onClick={nextDecree}
               type="button"
-              className="flex items-center gap-1.5 px-3 py-1 rounded-sm border border-white/10 hover:border-[#3ddc84]/40 text-[10px] font-mono text-[#8a9490] hover:text-[#3ddc84] transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-white/8 hover:border-[#3ddc84]/38 text-[9px] font-mono text-[#5a7066] hover:text-[#3ddc84] transition-colors cursor-pointer"
+              style={{ background: "rgba(255,255,255,0.03)" }}
             >
               <RefreshCw className="w-3 h-3" />
               <span>CYCLE DECREE</span>
@@ -105,20 +114,23 @@ export default function DoomDecrees() {
           </div>
 
           {/* Citation Footer */}
-          <div className="mt-6 pt-4 border-t border-white/8 flex items-center justify-between">
-            <span className="text-xs font-mono text-[#c9a227] tracking-[0.2em] uppercase font-bold">
+          <div className="mt-6 pt-4 flex items-center justify-between" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <span className={`text-xs font-mono tracking-[0.22em] uppercase font-bold ${isGold ? "text-[#c9a227]" : "text-[#3ddc84]"}`}>
               {DECREES[index].citation}
             </span>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               {DECREES.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setIndex(i)}
                   aria-label={`View decree ${i + 1}`}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === i ? "bg-[#3ddc84] w-5" : "bg-white/20 hover:bg-white/40"
-                  }`}
+                  className="transition-all duration-300 cursor-pointer"
+                  style={{
+                    width: index === i ? "20px" : "6px",
+                    height: "4px",
+                    background: index === i ? "#3ddc84" : "rgba(255,255,255,0.18)",
+                  }}
                 />
               ))}
             </div>
