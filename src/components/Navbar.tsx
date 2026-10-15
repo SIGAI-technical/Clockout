@@ -105,9 +105,9 @@ export default function Navbar({
         background: isDefined ? "rgba(5,6,5,0.92)" : "transparent",
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+      <div className="w-full flex items-center justify-between">
         {/* Brand */}
-        <a href="#" className="flex items-center gap-3 group cursor-pointer select-none" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+        <a href="#" className="flex items-center gap-3 group cursor-pointer select-none pl-3 sm:pl-6 md:pl-8" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
           {/* Doom Crest Icon */}
           <div className="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center">
             <div className="absolute inset-0 rounded-sm border border-[#3ddc84]/40 group-hover:border-[#3ddc84]/70 transition-colors" />
@@ -129,7 +129,7 @@ export default function Navbar({
         </a>
 
         {/* Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 pr-3 sm:pr-6 md:pr-8">
           {showSkipIntro && (
             <button
               onClick={onSkipIntro}

@@ -105,11 +105,20 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
     // Primary seek execution
     const executeSeek = useCallback((key: "v1" | "v2" | "v3", targetTime: number) => {
       const video = key === "v1" ? v1Ref.current : key === "v2" ? v2Ref.current : v3Ref.current;
-      if (!video || video.readyState < 1) return;
+      if (!video) return;
 
       const dur = video.duration || (key === "v1" ? V1_DUR : key === "v2" ? V2_DUR : V3_DUR);
       // Keep safely away from exact EOF (0.08s) so browsers never trigger loop or onended reset
       const clamped = Math.max(0, Math.min(dur - 0.08, targetTime));
+
+      // On mobile, if metadata is still loading, store the pending seek and trigger load
+      if (video.readyState < 1) {
+        pendingSeekRef.current[key] = clamped;
+        try {
+          video.load();
+        } catch {}
+        return;
+      }
 
       // Skip negligible changes (< 20ms)
       if (Math.abs(video.currentTime - clamped) < 0.02) return;
@@ -144,7 +153,7 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       executeSeekRef.current = executeSeek;
     }, [executeSeek]);
 
-    // Seeked listener cleanup
+    // Seeked and metadata ready listener cleanup
     useEffect(() => {
       const timers = fallbackTimerRef.current;
       const videos: { key: "v1" | "v2" | "v3"; el: HTMLVideoElement | null }[] = [
@@ -168,8 +177,23 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
           }
         };
 
+        const onReady = () => {
+          if (pendingSeekRef.current[key] !== null) {
+            const next = pendingSeekRef.current[key]!;
+            pendingSeekRef.current[key] = null;
+            executeSeekRef.current(key, next);
+          }
+        };
+
         el.addEventListener("seeked", onSeeked, { passive: true });
-        return () => el.removeEventListener("seeked", onSeeked);
+        el.addEventListener("loadedmetadata", onReady, { passive: true });
+        el.addEventListener("canplay", onReady, { passive: true });
+
+        return () => {
+          el.removeEventListener("seeked", onSeeked);
+          el.removeEventListener("loadedmetadata", onReady);
+          el.removeEventListener("canplay", onReady);
+        };
       });
 
       return () => {
@@ -280,18 +304,56 @@ const CinematicScroll = forwardRef<CinematicScrollHandle, CinematicScrollProps>(
       return () => window.removeEventListener("resize", check);
     }, []);
 
-    // Prime videos once on mount
-    const primedRef = useRef(false);
+    // Prime and unlock video decoding on mobile devices
     useEffect(() => {
-      if (primedRef.current) return;
-      primedRef.current = true;
-      [v1Ref, v2Ref, v3Ref].forEach((r) => {
-        if (r.current) {
-          r.current.muted = true;
-          r.current.playsInline = true;
-          r.current.setAttribute("webkit-playsinline", "true");
-        }
-      });
+      const unlockVideos = () => {
+        [v1Ref, v2Ref, v3Ref].forEach((r) => {
+          const v = r.current;
+          if (!v) return;
+
+          v.muted = true;
+          v.defaultMuted = true;
+          v.playsInline = true;
+          v.setAttribute("muted", "");
+          v.setAttribute("playsinline", "");
+          v.setAttribute("webkit-playsinline", "true");
+
+          // For iOS Safari: play and immediate pause unlocks the hardware video rendering pipeline
+          if (v.readyState < 2) {
+            const p = v.play();
+            if (p !== undefined) {
+              p.then(() => {
+                v.pause();
+              }).catch(() => {
+                try {
+                  v.load();
+                } catch {}
+              });
+            } else {
+              try {
+                v.load();
+              } catch {}
+            }
+          }
+        });
+      };
+
+      unlockVideos();
+
+      // Mobile browsers require a user interaction to unblock video decoding
+      const onUserInteraction = () => {
+        unlockVideos();
+      };
+
+      window.addEventListener("touchstart", onUserInteraction, { passive: true, once: true });
+      window.addEventListener("pointerdown", onUserInteraction, { passive: true, once: true });
+      window.addEventListener("scroll", onUserInteraction, { passive: true, once: true });
+
+      return () => {
+        window.removeEventListener("touchstart", onUserInteraction);
+        window.removeEventListener("pointerdown", onUserInteraction);
+        window.removeEventListener("scroll", onUserInteraction);
+      };
     }, []);
 
     // Main GSAP ScrollTrigger Integration
